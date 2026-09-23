@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>명리(命理) - 정통 만세력 & 쉬운 사주 오행 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Serif+KR:wght@400;600;700;900&family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lunar JavaScript Library with Fallback CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.7.7/lunar.js"></script>
+    <script>
+        if (typeof Solar === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.js"><\/script>');
+        }
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hanji: '#FDFBF7',
+                        ink: '#1C1917',
+                        gold: '#B45309',
+                        goldLight: '#FEF3C7',
+                        woodColor: '#15803D',
+                        fireColor: '#DC2626',
+                        earthColor: '#B45309',
+                        metalColor: '#475569',
+                        waterColor: '#1D4ED8',
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif KR"', '"Gowun Batang"', 'serif'],
+                        sans: ['Pretendard', 'sans-serif'],
+                        batang: ['"Gowun Batang"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F7F4EF;
+            background-image: radial-gradient(#E5DECF 0.8px, transparent 0.8px), radial-gradient(#E5DECF 0.8px, #F7F4EF 0.8px);
+            background-size: 28px 28px;
+            background-position: 0 0, 14px 14px;
+            font-family: 'Pretendard', sans-serif;
+            color: #1C1917;
+        }
+
+        .hanji-card {
+            background: rgba(253, 251, 247, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 197, 176, 0.7);
+            box-shadow: 0 10px 25px -5px rgba(60, 40, 20, 0.06);
+        }
+
+        /* Direct, distinct Element Colors for Hanja text */
+        .color-wood { color: #15803D !important; }
+        .color-fire { color: #DC2626 !important; }
+        .color-earth { color: #B45309 !important; }
+        .color-metal { color: #475569 !important; }
+        .color-water { color: #1D4ED8 !important; }
+
+        /* Card background tints for Pillars */
+        .bg-pillar-wood { background-color: #F0FDF4; border-color: #BBF7D0; }
+        .bg-pillar-fire { background-color: #FEF2F2; border-color: #FECACA; }
+        .bg-pillar-earth { background-color: #FFFBEB; border-color: #FDE68A; }
+        .bg-pillar-metal { background-color: #F8FAFC; border-color: #E2E8F0; }
+        .bg-pillar-water { background-color: #EFF6FF; border-color: #BFDBFE; }
+
+        /* Badges */
+        .badge-wood { background-color: #15803D; color: #ffffff; }
+        .badge-fire { background-color: #DC2626; color: #ffffff; }
+        .badge-earth { background-color: #B45309; color: #ffffff; }
+        .badge-metal { background-color: #475569; color: #ffffff; }
+        .badge-water { background-color: #1D4ED8; color: #ffffff; }
+
+        .btn-hanok {
+            background: linear-gradient(135deg, #2D2B2A 0%, #1A1918 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-hanok:hover {
+            background: linear-gradient(135deg, #4A4441 0%, #2D2B2A 100%);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        @media print {
+            body { background: white !important; }
+            .no-print { display: none !important; }
+            .print-full { width: 100% !important; max-width: 100% !important; box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+
+    <header class="max-w-4xl mx-auto text-center mb-8">
+        <div class="inline-flex items-center justify-center space-x-2 mb-2">
+            <span class="h-px w-8 bg-amber-600"></span>
+            <span class="text-xs uppercase tracking-widest text-amber-700 font-semibold font-serif">Traditional Saju & Classical Interpretation</span>
+            <span class="h-px w-8 bg-amber-600"></span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-serif font-bold text-ink tracking-tight mb-2">
+            명리 (命理) <span class="text-base font-normal text-stone-600 block sm:inline sm:ml-2 font-sans">- 쉬운 만세력 & 오행 사주 풀이</span>
+        </h1>
+        <p class="text-sm text-stone-600 font-batang max-w-lg mx-auto">
+            생년월일시로 내 사주팔자(四柱八字)와 오행(五行)을 추출하고, 고전 문헌(적천수·자평진전) 기반의 쉬운 풀이를 확인해보세요.
+        </p>
+    </header>
+
+    <main class="max-w-4xl mx-auto space-y-8">
+
+        <section class="hanji-card rounded-2xl p-6 sm:p-8 no-print border">
+            <h2 class="text-xl font-serif font-bold text-ink mb-6 flex items-center border-b border-stone-200 pb-3">
+                <i class="fa-solid fa-compass text-amber-600 mr-3"></i> 사주 정보 입력 (生年月日時)
+            </h2>
+
+            <form id="sajuForm" onsubmit="event.preventDefault(); calculateSaju();" class="space-y-6">
+                <!-- Solar/Lunar & Gender Selectors -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Calendar Type -->
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">음양력 구분</label>
+                        <div class="grid grid-cols-2 gap-2 bg-stone-100 p-1 rounded-xl">
+                            <label class="cursor-pointer text-center py-2 text-sm font-medium rounded-lg transition-all" id="lbl-solar">
+                                <input type="radio" name="calendarType" value="solar" checked class="hidden" onchange="toggleCalendarType()">
+                                <i class="fa-solid fa-sun mr-1 text-amber-500"></i> 양력 (Solar)
+                            </label>
+                            <label class="cursor-pointer text-center py-2 text-sm font-medium rounded-lg transition-all" id="lbl-lunar">
+                                <input type="radio" name="calendarType" value="lunar" class="hidden" onchange="toggleCalendarType()">
+                                <i class="fa-solid fa-moon mr-1 text-indigo-400"></i> 음력 (Lunar)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-2">성별</label>
+                        <div class="grid grid-cols-2 gap-2 bg-stone-100 p-1 rounded-xl">
+                            <label class="cursor-pointer text-center py-2 text-sm font-medium rounded-lg transition-all" id="lbl-male">
+                                <input type="radio" name="gender" value="male" checked class="hidden" onchange="updateRadioStyles()">
+                                <i class="fa-solid fa-mars mr-1 text-blue-500"></i> 남성 (男)
+                            </label>
+                            <label class="cursor-pointer text-center py-2 text-sm font-medium rounded-lg transition-all" id="lbl-female">
+                                <input type="radio" name="gender" value="female" class="hidden" onchange="updateRadioStyles()">
+                                <i class="fa-solid fa-venus mr-1 text-rose-500"></i> 여성 (女)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leap Month Option -->
+                <div id="leapMonthContainer" class="hidden bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                    <label class="inline-flex items-center cursor-pointer text-sm text-indigo-900 font-medium">
+                        <input type="checkbox" id="isLeapMonth" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4 mr-2">
+                        <span>윤달(潤月) 적용</span>
+                    </label>
+                </div>
+
+                <!-- Date Inputs -->
+                <div class="grid grid-cols-3 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-stone-600 mb-1">태어난 해 (년)</label>
+                        <select id="birthYear" class="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-stone-600 mb-1">태어난 달 (월)</label>
+                        <select id="birthMonth" class="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-stone-600 mb-1">태어난 날 (일)</label>
+                        <select id="birthDay" class="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></select>
+                    </div>
+                </div>
+
+                <!-- Time Input -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-xs font-medium text-stone-600">태어난 시각 (시/분)</label>
+                        <label class="inline-flex items-center text-xs text-stone-500 cursor-pointer">
+                            <input type="checkbox" id="timeUnsure" class="rounded text-amber-600 focus:ring-amber-500 h-3.5 w-3.5 mr-1" onchange="toggleTimeUnsure()">
+                            <span>태어난 시 모름 (시주 제외)</span>
+                        </label>
+                    </div>
+
+                    <div id="timeSelectGroup" class="grid grid-cols-2 gap-3 sm:gap-4">
+                        <div>
+                            <select id="birthHour" class="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></select>
+                        </div>
+                        <div>
+                            <select id="birthMinute" class="w-full bg-white border border-stone-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full btn-hanok text-white font-medium py-3.5 rounded-xl shadow-lg flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-scroll text-amber-400"></i>
+                    <span class="text-base tracking-wide font-serif">만세력 조회 및 오행 사주 분석</span>
+                </button>
+            </form>
+        </section>
+
+        <div id="resultSection" class="hidden space-y-8">
+            
+            <!-- Result Action Bar -->
+            <div class="flex justify-between items-center no-print bg-stone-200/60 p-2.5 rounded-2xl border border-stone-300">
+                <span class="text-xs text-stone-600 ml-2 font-medium">
+                    <i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> 사주 팔자 조회가 완료되었습니다.
+                </span>
+                <div class="flex space-x-2">
+                    <button onclick="copySummaryText()" class="bg-white hover:bg-stone-50 text-stone-700 text-xs px-3 py-1.5 rounded-xl border border-stone-300 transition-colors flex items-center">
+                        <i class="fa-regular fa-copy mr-1"></i> 요약 복사
+                    </button>
+                    <button onclick="window.print()" class="bg-white hover:bg-stone-50 text-stone-700 text-xs px-3 py-1.5 rounded-xl border border-stone-300 transition-colors flex items-center">
+                        <i class="fa-solid fa-print mr-1"></i> 인쇄
+                    </button>
+                </div>
+            </div>
+
+            <!-- 1. Four Pillars (사주팔자) Section with Colored Hanja -->
+            <section class="hanji-card rounded-2xl p-6 sm:p-8 border print-full">
+                <div class="flex justify-between items-start mb-6 border-b border-stone-200 pb-4">
+                    <div>
+                        <h3 class="text-xl font-serif font-bold text-ink flex items-center">
+                            <span>사주팔자 (四柱八字)</span>
+                        </h3>
+                        <p class="text-xs text-stone-500 mt-1" id="convertedDateText"></p>
+                    </div>
+                    <span id="genderBadge" class="px-3 py-1 text-xs rounded-full font-medium"></span>
+                </div>
+
+                <!-- 4 Pillars Grid -->
+                <div class="grid grid-cols-4 gap-2 sm:gap-4 text-center">
+                    <div class="text-xs font-semibold text-stone-500 py-1 bg-stone-100 rounded-lg">시주 (時柱)</div>
+                    <div class="text-xs font-semibold text-stone-500 py-1 bg-stone-100 rounded-lg">일주 (日柱)</div>
+                    <div class="text-xs font-semibold text-stone-500 py-1 bg-stone-100 rounded-lg">월주 (月柱)</div>
+                    <div class="text-xs font-semibold text-stone-500 py-1 bg-stone-100 rounded-lg">년주 (年柱)</div>
+
+                    <!-- Heavenly Stems (천간) -->
+                    <div id="pillar-time-gan" class="rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm"></div>
+                    <div id="pillar-day-gan" class="rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm ring-2 ring-amber-500/50"></div>
+                    <div id="pillar-month-gan" class="rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm"></div>
+                    <div id="pillar-year-gan" class="rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm"></div>
+
+                    <!-- Earthly Branches (지지도) -->
+                    <div id="pillar-time-zhi" class="rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm"></div>
+                    <div id="pillar-day-zhi" class="rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm ring-2 ring-amber-500/50"></div>
+                    <div id="pillar-month-zhi" class="rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm"></div>
+                    <div id="pillar-year-zhi" class="rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm"></div>
+                </div>
+
+                <!-- Legend of Colors -->
+                <div class="mt-6 pt-4 border-t border-stone-200/60 flex flex-wrap justify-center items-center gap-3 text-xs text-stone-600">
+                    <span class="font-semibold text-stone-700">오행 색상 표기:</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full badge-wood mr-1"></span> 목(木): 초록</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full badge-fire mr-1"></span> 화(火): 빨강</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full badge-earth mr-1"></span> 토(土): 황토</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full badge-metal mr-1"></span> 금(金): 회색</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full badge-water mr-1"></span> 수(水): 파랑</span>
+                </div>
+            </section>
+
+            <!-- 2. Five Elements (오행 분석) Distribution -->
+            <section class="hanji-card rounded-2xl p-6 sm:p-8 border">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 border-b border-stone-200 pb-3">
+                    <div>
+                        <h3 class="text-xl font-serif font-bold text-ink">오행 비율 및 분포 분석 (五行 分析)</h3>
+                        <p class="text-xs text-stone-500 mt-0.5">내 사주 속 목(木)·화(火)·토(土)·금(金)·수(水) 에너지 비중입니다.</p>
+                    </div>
+                    <div id="elementSummaryBadge" class="mt-2 sm:mt-0 flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Element Cards Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6" id="elementCardsGrid"></div>
+
+                <!-- Combined Progress Bar Distribution -->
+                <div class="space-y-2 bg-stone-50 p-4 rounded-xl border border-stone-200">
+                    <div class="flex justify-between items-center text-xs font-semibold text-stone-700">
+                        <span class="flex items-center"><i class="fa-solid fa-chart-pie mr-1.5 text-amber-600"></i> 오행 비율 분포 그래프</span>
+                        <span id="totalElementsCountText" class="text-stone-500">총 8자</span>
+                    </div>
+                    <div id="elementProgressBar" class="h-5 w-full bg-stone-200 rounded-full overflow-hidden flex shadow-inner"></div>
+                    <div id="elementLegend" class="flex flex-wrap justify-center gap-3 pt-2 text-xs font-medium text-stone-600"></div>
+                </div>
+            </section>
+
+            <!-- 3. Day Master & Easy Classical Saju Interpretation (적천수·자평진전 기반 중학생 눈높이 해설) -->
+            <section class="hanji-card rounded-2xl p-6 sm:p-8 border space-y-6">
+                <!-- Day Master Profile Header -->
+                <div class="flex items-center space-x-3 border-b border-stone-200 pb-4">
+                    <span class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-serif text-2xl font-bold shadow-inner" id="dayMasterChar">
+                        -
+                    </span>
+                    <div>
+                        <h3 class="text-xl font-serif font-bold text-ink" id="dayMasterTitle">나를 상징하는 일간(日干)</h3>
+                        <p class="text-xs text-amber-700 font-medium" id="dayMasterSub">-</p>
+                    </div>
+                </div>
+
+                <!-- Easy Classical Interpretation Box -->
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2 text-stone-800 font-serif font-bold text-base">
+                        <i class="fa-solid fa-book-open text-amber-600"></i>
+                        <span>쉽게 이해하는 내 사주 풀이 (적천수·자평진전 원리)</span>
+                        <span class="text-xs font-sans font-normal text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">중학생도 이해하는 쉬운 해설</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Left: Day Master Personality -->
+                        <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200/70 space-y-2">
+                            <h4 class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center">
+                                <i class="fa-solid fa-user-gear mr-1.5"></i> 내 타고난 캐릭터 성향
+                            </h4>
+                            <p class="text-xs text-stone-700 leading-relaxed font-sans" id="dayMasterDescText">
+                                <!-- Dynamic Day Master Description -->
+                            </p>
+                        </div>
+
+                        <!-- Right: Elemental Balance Tip -->
+                        <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 space-y-2">
+                            <h4 class="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center">
+                                <i class="fa-solid fa-scale-balanced mr-1.5 text-amber-600"></i> 오행 에너지와 성공 팁
+                            </h4>
+                            <p class="text-xs text-stone-700 leading-relaxed font-sans" id="elementalAdviceText">
+                                <!-- Dynamic Elemental Advice -->
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Interactive Gemini AI Deep Interpretation Feature -->
+                <div class="pt-4 border-t border-stone-200">
+                    <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 p-5 rounded-2xl border border-amber-200/80 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <h4 class="font-serif font-bold text-stone-900 flex items-center text-base">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-600 mr-2"></i> Gemini AI 명리 심층 풀이
+                                </h4>
+                                <p class="text-xs text-stone-600">고전 명리서(적천수, 자평진전) 원리를 바탕으로 Gemini AI가 내 사주를 맞춤 분석합니다.</p>
+                            </div>
+                            <button id="btnAiAnalyze" onclick="generateAiSajuReading()" class="bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs px-4 py-2.5 rounded-xl shadow transition-all flex items-center justify-center space-x-1.5 shrink-0">
+                                <i class="fa-solid fa-brain"></i>
+                                <span>AI 심층 풀이 요청하기</span>
+                            </button>
+                        </div>
+
+                        <!-- AI Response Box -->
+                        <div id="aiReadingResult" class="hidden bg-white p-4 rounded-xl border border-amber-200/60 text-xs leading-relaxed text-stone-800 space-y-2">
+                            <div class="flex items-center justify-between font-semibold text-amber-800 border-b border-stone-100 pb-2">
+                                <span class="flex items-center"><i class="fa-solid fa-robot mr-1.5"></i> Gemini AI 오행 심층 해석</span>
+                                <span class="text-[10px] text-stone-400 font-normal">적천수·자평진전 해설</span>
+                            </div>
+                            <div id="aiReadingContent" class="prose prose-sm max-w-none text-stone-700 font-sans space-y-2"></div>
+                        </div>
+
+                        <!-- Loading Indicator -->
+                        <div id="aiLoading" class="hidden py-4 text-center space-y-2">
+                            <i class="fa-solid fa-spinner fa-spin text-amber-600 text-xl"></i>
+                            <p class="text-xs text-stone-600 font-medium">Gemini AI가 고전 명리서를 탐색하여 맞춤 해석을 생성하고 있습니다...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-stone-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-info text-amber-400"></i>
+        <span id="toastMsg">메시지</span>
+    </div>
+
+    <script>
+        // Mappings for Five Elements with Both Hanja and Hangul support
+        const RAW_ELEMENTS = [
+            // 천간 (Heavenly Stems)
+            { hanja: '甲', hangul: '갑', name: '목', type: 'wood', polarity: '양', color: '#15803D' },
+            { hanja: '乙', hangul: '을', name: '목', type: 'wood', polarity: '음', color: '#15803D' },
+            { hanja: '丙', hangul: '병', name: '화', type: 'fire', polarity: '양', color: '#DC2626' },
+            { hanja: '丁', hangul: '정', name: '화', type: 'fire', polarity: '음', color: '#DC2626' },
+            { hanja: '戊', hangul: '무', name: '토', type: 'earth', polarity: '양', color: '#B45309' },
+            { hanja: '己', hangul: '기', name: '토', type: 'earth', polarity: '음', color: '#B45309' },
+            { hanja: '庚', hangul: '경', name: '금', type: 'metal', polarity: '양', color: '#475569' },
+            { hanja: '辛', hangul: '신', name: '금', type: 'metal', polarity: '음', color: '#475569' },
+            { hanja: '壬', hangul: '임', name: '수', type: 'water', polarity: '양', color: '#1D4ED8' },
+            { hanja: '癸', hangul: '계', name: '수', type: 'water', polarity: '음', color: '#1D4ED8' },
+
+            // 지지 (Earthly Branches)
+            { hanja: '寅', hangul: '인', name: '목', type: 'wood', polarity: '양', animal: '호랑이', color: '#15803D' },
+            { hanja: '卯', hangul: '묘', name: '목', type: 'wood', polarity: '음', animal: '토끼', color: '#15803D' },
+            { hanja: '巳', hangul: '사', name: '화', type: 'fire', polarity: '양', animal: '뱀', color: '#DC2626' },
+            { hanja: '午', hangul: '오', name: '화', type: 'fire', polarity: '음', animal: '말', color: '#DC2626' },
+            { hanja: '辰', hangul: '진', name: '토', type: 'earth', polarity: '양', animal: '용', color: '#B45309' },
+            { hanja: '戌', hangul: '술', name: '토', type: 'earth', polarity: '양', animal: '개', color: '#B45309' },
+            { hanja: '丑', hangul: '축', name: '토', type: 'earth', polarity: '음', animal: '소', color: '#B45309' },
+            { hanja: '未', hangul: '미', name: '토', type: 'earth', polarity: '음', animal: '양', color: '#B45309' },
+            { hanja: '申', hangul: '신', name: '금', type: 'metal', polarity: '양', animal: '원숭이', color: '#475569' },
+            { hanja: '酉', hangul: '유', name: '금', type: 'metal', polarity: '음', animal: '닭', color: '#475569' },
+            { hanja: '亥', hangul: '해', name: '수', type: 'water', polarity: '양', animal: '돼지', color: '#1D4ED8' },
+            { hanja: '子', hangul: '자', name: '수', type: 'water', polarity: '음', animal: '쥐', color: '#1D4ED8' }
+        ];
+
+        const ELEMENTS_MAP = {};
+        RAW_ELEMENTS.forEach(item => {
+            ELEMENTS_MAP[item.hanja] = item;
+            ELEMENTS_MAP[item.hangul] = item;
+        });
+
+        // Middle Schooler Friendly Classical Interpretation Database (적천수·자평진전 해설)
+        const DAY_MASTER_INFO = {
+            '갑': {
+                name: '갑목(甲木)',
+                title: '땅을 뚫고 올라오는 곧은 큰 나무',
+                desc: '갑목은 사막이나 넓은 들판에 곧게 뻗은 대나무나 소나무 같아요. 남에게 굽히기 싫어하고 내 뜻대로 곧게 나아가는 씩씩함과 리더십이 뛰어납니다!',
+                classical: '《적천수》에서는 갑목을 "참천비세(參天飛勢)"라 하여 하늘을 향해 곧게 자라는 생명력으로 봅니다. 추진력이 좋지만 너무 부러지지 않게 유연함을 기르면 대성합니다.'
+            },
+            '을': {
+                name: '을목(乙木)',
+                title: '바람에 유연하게 춤추는 예쁜 화초',
+                desc: '을목은 장미꽃이나 덩굴식물 같아요. 부드럽고 친근해서 친구들과 잘 어울리며, 어떤 어려움이 와도 오뚝이처럼 다시 일어서는 단단한 끈기가 있어요!',
+                classical: '《적천수》에서는 을목을 "휴수회목(休水懷木)"이라 하여 유연한 생존력을 칭찬합니다. 주위 환경과 지혜롭게 화합하는 능력이 최고의 무기입니다.'
+            },
+            '병': {
+                name: '병화(丙火)',
+                title: '세상을 환하게 비추는 열정의 태양',
+                desc: '병화는 하늘에 떠 있는 따뜻하고 뜨거운 태양이에요. 마음이 솔직하고 뒤끝이 없으며, 주위 사람들을 항상 즐겁고 환하게 만들어주는 인기가 넘쳐요!',
+                classical: '《적천수》에서는 "병화맹렬(丙火猛烈)"이라 하여 밝고 정직한 기운을 뜻합니다. 마음이 급해질 때 한 번 더 숨을 고르면 모두에게 존경받습니다.'
+            },
+            '정': {
+                name: '정화(丁火)',
+                title: '어둠을 밝히는 따뜻한 촛불과 모닥불',
+                desc: '정화는 밤하늘의 별이나 따스한 모닥불 같아요. 마음이 섬세하고 배려심이 깊으며, 한 가지에 몰입하는 집중력이 아주 뛰어납니다!',
+                classical: '《적천수》에서 정화는 "소융내영(昭融內映)"으로 내면의 따뜻한 지혜를 가리킵니다. 은근한 끈기와 깊은 관찰력으로 실력을 인정받습니다.'
+            },
+            '무': {
+                name: '무토(戊土)',
+                title: '모든 것을 품어주는 든든하고 거대한 산',
+                desc: '무토는 높고 넓은 산과 대지에 비유해요. 말수가 적고 묵직해서 친구들에게 큰 신뢰를 주며, 마음이 넓어서 뭐든 넓게 품어주는 든든한 존재입니다!',
+                classical: '《적천수》에서 무토는 "중후광대(重厚廣大)"라 하여 깊은 신용을 뜻합니다. 서두르지 않고 차분하게 준비할 때 큰 결과를 이룹니다.'
+            },
+            '기': {
+                name: '기토(己土)',
+                title: '만물을 키워내는 친절하고 정겨운 정원 흙',
+                desc: '기토는 비옥한 정원이나 밭의 흙 같아요. 현실 감각이 좋고 세심하며, 주변 친구들의 마음을 다정하게 받아주고 키워주는 따뜻한 사람입니다!',
+                classical: '《자평진전》에서는 기토의 "자양(滋養)" 능력을 핵심으로 봅니다. 실속 있고 알뜰하게 자신과 타인을 모두 성장시키는 능력이 훌륭합니다.'
+            },
+            '경': {
+                name: '경금(庚金)',
+                title: '불의를 참지 못하는 단단한 원석과 단검',
+                desc: '경금은 제련되기 전의 단단한 철광석이나 명검 같아요. 결단력이 빠르고 약속과 의리를 중요하게 생각하며, 옳지 못한 일을 보면 씩씩하게 나섭니다!',
+                classical: '《적천수》에서 경금은 "강건중정(剛健中正)"의 정의로움을 뜻합니다. 자기 절제와 단련을 거치면 세상을 바꾸는 큰 인물이 됩니다.'
+            },
+            '신': {
+                name: '신금(辛金)',
+                title: '반짝반짝 빛나는 예리한 보석과 다이아몬드',
+                desc: '신금은 다듬어진 예쁜 보석이나 다이아몬드 같아요. 섬세하고 완벽주의 성향이 있으며, 미적 감각이 뛰어나고 스스로를 가꾸는 것을 좋아합니다!',
+                classical: '《적천수》에서 신금은 "온윤청유(溫潤淸潤)"라 하여 맑고 깨끗한 명예를 뜻합니다. 섬세한 관찰력과 감각을 살리면 특정 분야의 전문가가 됩니다.'
+            },
+            '임': {
+                name: '임수(壬水)',
+                title: '끝없이 흘러가는 도도하고 넓은 바다',
+                desc: '임수는 넓은 바다나 큰 강물 같아요. 지혜가 깊고 생각이 넓으며, 어떤 상황에서도 막히지 않고 물처럼 유연하게 대처하는 능력이 있습니다!',
+                classical: '《적천수》에서 임수는 "통하중류(通河衆流)"라 하여 막힘없는 지혜를 뜻합니다. 넓은 시야와 상상력을 발휘하면 지식의 리더가 됩니다.'
+            },
+            '계': {
+                name: '계수(癸水)',
+                title: '조용히 산천을 적시는 맑고 고운 단비',
+                desc: '계수는 조용히 내리는 봄비나 마르지 않는 샘물 같아요. 순발력이 뛰어나고 마음이 맑으며, 타인의 감정을 잘 읽어주는 지혜로운 사람입니다!',
+                classical: '《적천수》에서 계수는 "달어간지(達於幹支)"라 하여 세심한 감수성을 뜻합니다. 조용하지만 꾸준히 스며드는 부드러운 힘으로 목표를 이룹니다.'
+            }
+        };
+
+        // State Store for Current Saju
+        let currentSajuData = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDateSelectors();
+            updateRadioStyles();
+        });
+
+        function initDateSelectors() {
+            const yearSel = document.getElementById('birthYear');
+            const monthSel = document.getElementById('birthMonth');
+            const daySel = document.getElementById('birthDay');
+            const hourSel = document.getElementById('birthHour');
+            const minSel = document.getElementById('birthMinute');
+
+            const currentYear = new Date().getFullYear();
+            for (let y = currentYear; y >= 1920; y--) {
+                yearSel.add(new Option(`${y}년`, y));
+            }
+            yearSel.value = 2010; // Default for easy middle-schooler range test
+
+            for (let m = 1; m <= 12; m++) monthSel.add(new Option(`${m}월`, m));
+            monthSel.value = 5;
+
+            for (let d = 1; d <= 31; d++) daySel.add(new Option(`${d}일`, d));
+            daySel.value = 15;
+
+            for (let h = 0; h < 24; h++) {
+                hourSel.add(new Option(`${String(h).padStart(2, '0')}시`, h));
+            }
+            hourSel.value = 14;
+
+            for (let min = 0; min < 60; min += 5) {
+                minSel.add(new Option(`${String(min).padStart(2, '0')}분`, min));
+            }
+            minSel.value = 30;
+        }
+
+        function toggleCalendarType() {
+            const calendarType = document.querySelector('input[name="calendarType"]:checked').value;
+            const leapContainer = document.getElementById('leapMonthContainer');
+            if (calendarType === 'lunar') leapContainer.classList.remove('hidden');
+            else leapContainer.classList.add('hidden');
+            updateRadioStyles();
+        }
+
+        function toggleTimeUnsure() {
+            const timeUnsure = document.getElementById('timeUnsure').checked;
+            const timeSelectGroup = document.getElementById('timeSelectGroup');
+            if (timeUnsure) timeSelectGroup.classList.add('opacity-40', 'pointer-events-none');
+            else timeSelectGroup.classList.remove('opacity-40', 'pointer-events-none');
+        }
+
+        function updateRadioStyles() {
+            ['lbl-solar', 'lbl-lunar', 'lbl-male', 'lbl-female'].forEach(id => {
+                const el = document.getElementById(id);
+                const input = el.querySelector('input');
+                if (input.checked) {
+                    el.classList.add('bg-white', 'text-ink', 'shadow-sm');
+                    el.classList.remove('text-stone-500');
+                } else {
+                    el.classList.remove('bg-white', 'text-ink', 'shadow-sm');
+                    el.classList.add('text-stone-500');
+                }
+            });
+        }
+
+        function calculateSaju() {
+            try {
+                const SolarClass = typeof Solar !== 'undefined' ? Solar : (window.Solar || null);
+                const LunarClass = typeof Lunar !== 'undefined' ? Lunar : (window.Lunar || null);
+
+                if (!SolarClass || !LunarClass) {
+                    showToast("만세력 라이브러리를 불러오는 중입니다. 잠시 후 시도해주세요.");
+                    return;
+                }
+
+                const calendarType = document.querySelector('input[name="calendarType"]:checked').value;
+                const gender = document.querySelector('input[name="gender"]:checked').value;
+                const year = parseInt(document.getElementById('birthYear').value);
+                const month = parseInt(document.getElementById('birthMonth').value);
+                const day = parseInt(document.getElementById('birthDay').value);
+                const isTimeUnsure = document.getElementById('timeUnsure').checked;
+                const hour = isTimeUnsure ? 0 : parseInt(document.getElementById('birthHour').value);
+                const minute = isTimeUnsure ? 0 : parseInt(document.getElementById('birthMinute').value);
+                const isLeapMonth = document.getElementById('isLeapMonth').checked;
+
+                let lunarObj, solarObj;
+
+                if (calendarType === 'solar') {
+                    solarObj = SolarClass.fromYmdHms(year, month, day, hour, minute, 0);
+                    lunarObj = solarObj.getLunar();
+                } else {
+                    lunarObj = LunarClass.fromYmdHms(year, isLeapMonth ? -month : month, day, hour, minute, 0);
+                    solarObj = lunarObj.getSolar();
+                }
+
+                const eightChar = lunarObj.getEightChar();
+
+                const pillars = {
+                    year: { gan: eightChar.getYearGan(), zhi: eightChar.getYearZhi() },
+                    month: { gan: eightChar.getMonthGan(), zhi: eightChar.getMonthZhi() },
+                    day: { gan: eightChar.getDayGan(), zhi: eightChar.getDayZhi() },
+                    time: isTimeUnsure ? null : { gan: eightChar.getTimeGan(), zhi: eightChar.getTimeZhi() }
+                };
+
+                // Store state for AI API calls
+                currentSajuData = {
+                    solar: `${solarObj.getYear()}-${solarObj.getMonth()}-${solarObj.getDay()}`,
+                    lunar: `${lunarObj.getYear()}-${Math.abs(lunarObj.getMonth())}-${lunarObj.getDay()}`,
+                    gender: gender === 'male' ? '남성' : '여성',
+                    dayGan: pillars.day.gan,
+                    pillars: pillars,
+                    isTimeUnsure: isTimeUnsure
+                };
+
+                // 1. Render Pillars with explicit colors
+                renderPillars(pillars, isTimeUnsure);
+
+                // 2. Render Elements Breakdown & Progress Bars
+                const elemCounts = renderElementsAnalysis(pillars, isTimeUnsure);
+                currentSajuData.elemCounts = elemCounts;
+
+                // 3. Render Easy Classical Interpretation
+                renderEasyInterpretation(pillars.day.gan, elemCounts);
+
+                // Converted Date Text
+                const isLeap = typeof lunarObj.isLeap === 'function' ? lunarObj.isLeap() : (lunarObj.getMonth && lunarObj.getMonth() < 0);
+                const lunarMonth = Math.abs(lunarObj.getMonth());
+                const dateText = `양력: ${solarObj.getYear()}년 ${solarObj.getMonth()}월 ${solarObj.getDay()}일 ${isTimeUnsure ? '' : hour + '시 ' + minute + '분'} | 음력: ${lunarObj.getYear()}년 ${lunarMonth}월 ${lunarObj.getDay()}일 ${isLeap ? '(윤달)' : ''}`;
+                document.getElementById('convertedDateText').innerText = dateText;
+
+                // Gender Badge
+                const genderBadge = document.getElementById('genderBadge');
+                genderBadge.innerText = gender === 'male' ? '남성 (陽)' : '여성 (陰)';
+                genderBadge.className = gender === 'male' ? 'px-3 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-800' : 'px-3 py-1 text-xs rounded-full font-medium bg-rose-100 text-rose-800';
+
+                // Reset AI Reading box
+                document.getElementById('aiReadingResult').classList.add('hidden');
+
+                // Unhide Result Section
+                document.getElementById('resultSection').classList.remove('hidden');
+                document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error(err);
+                showToast("사주 정보를 계산하는 중 오류가 발생했습니다. 입력 정보를 확인해주세요.");
+            }
+        }
+
+        function renderPillars(pillars, isTimeUnsure) {
+            const list = [
+                { key: 'time', data: pillars.time, idGan: 'pillar-time-gan', idZhi: 'pillar-time-zhi' },
+                { key: 'day', data: pillars.day, idGan: 'pillar-day-gan', idZhi: 'pillar-day-zhi' },
+                { key: 'month', data: pillars.month, idGan: 'pillar-month-gan', idZhi: 'pillar-month-zhi' },
+                { key: 'year', data: pillars.year, idGan: 'pillar-year-gan', idZhi: 'pillar-year-zhi' }
+            ];
+
+            list.forEach(item => {
+                const elGan = document.getElementById(item.idGan);
+                const elZhi = document.getElementById(item.idZhi);
+
+                if (!item.data) {
+                    elGan.className = "rounded-xl p-3 border border-dashed border-stone-300 flex flex-col items-center justify-center h-32 sm:h-36 text-stone-400 bg-stone-50/50";
+                    elGan.innerHTML = `<span class="text-xs">미상</span>`;
+
+                    elZhi.className = "rounded-xl p-3 border border-dashed border-stone-300 flex flex-col items-center justify-center h-32 sm:h-36 text-stone-400 bg-stone-50/50";
+                    elZhi.innerHTML = `<span class="text-xs">미상</span>`;
+                    return;
+                }
+
+                const ganInfo = ELEMENTS_MAP[item.data.gan] || { name: '목', type: 'wood', hanja: item.data.gan, hangul: item.data.gan, polarity: '양', color: '#15803D' };
+                const zhiInfo = ELEMENTS_MAP[item.data.zhi] || { name: '목', type: 'wood', hanja: item.data.zhi, hangul: item.data.zhi, polarity: '양', color: '#15803D' };
+
+                // Heavenly Stem Card with explicit color style
+                elGan.className = `rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm bg-pillar-${ganInfo.type}`;
+                elGan.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="px-1.5 py-0.5 rounded text-[10px] badge-${ganInfo.type}">${ganInfo.name}(${ganInfo.polarity})</span>
+                        <span class="text-[10px] text-stone-500 font-medium">천간</span>
+                    </div>
+                    <div class="my-auto text-center">
+                        <div class="text-3xl sm:text-4xl font-serif font-black tracking-wider" style="color: ${ganInfo.color}; text-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                            ${ganInfo.hanja}
+                        </div>
+                        <div class="text-xs mt-1 font-bold text-stone-700">${ganInfo.hangul}</div>
+                    </div>
+                `;
+
+                // Earthly Branch Card with explicit color style
+                elZhi.className = `rounded-xl p-3 border flex flex-col justify-between h-32 sm:h-36 shadow-sm bg-pillar-${zhiInfo.type}`;
+                elZhi.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="px-1.5 py-0.5 rounded text-[10px] badge-${zhiInfo.type}">${zhiInfo.name}(${zhiInfo.polarity})</span>
+                        <span class="text-[10px] text-stone-500 font-medium">${zhiInfo.animal || '지지'}</span>
+                    </div>
+                    <div class="my-auto text-center">
+                        <div class="text-3xl sm:text-4xl font-serif font-black tracking-wider" style="color: ${zhiInfo.color}; text-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                            ${zhiInfo.hanja}
+                        </div>
+                        <div class="text-xs mt-1 font-bold text-stone-700">${zhiInfo.hangul}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderElementsAnalysis(pillars, isTimeUnsure) {
+            const counts = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+            let total = 0;
+
+            const addChar = (char) => {
+                if (!char) return;
+                const info = ELEMENTS_MAP[char];
+                if (info && counts[info.type] !== undefined) {
+                    counts[info.type]++;
+                    total++;
+                }
+            };
+
+            addChar(pillars.year.gan);
+            addChar(pillars.year.zhi);
+            addChar(pillars.month.gan);
+            addChar(pillars.month.zhi);
+            addChar(pillars.day.gan);
+            addChar(pillars.day.zhi);
+
+            if (!isTimeUnsure && pillars.time) {
+                addChar(pillars.time.gan);
+                addChar(pillars.time.zhi);
+            }
+
+            document.getElementById('totalElementsCountText').innerText = `총 ${total}자 분석`;
+
+            const elemDetails = [
+                { type: 'wood', label: '목 (木)', color: '#15803D', badge: 'badge-wood', bg: 'bg-emerald-50/80' },
+                { type: 'fire', label: '화 (火)', color: '#DC2626', badge: 'badge-fire', bg: 'bg-rose-50/80' },
+                { type: 'earth', label: '토 (土)', color: '#B45309', badge: 'badge-earth', bg: 'bg-amber-50/80' },
+                { type: 'metal', label: '금 (金)', color: '#475569', badge: 'badge-metal', bg: 'bg-slate-100/90' },
+                { type: 'water', label: '수 (水)', color: '#1D4ED8', badge: 'badge-water', bg: 'bg-blue-50/80' }
+            ];
+
+            let maxElem = elemDetails[0];
+            let minElems = [];
+            let maxVal = -1;
+
+            elemDetails.forEach(item => {
+                const count = counts[item.type];
+                if (count > maxVal) {
+                    maxVal = count;
+                    maxElem = item;
+                }
+                if (count === 0) minElems.push(item);
+            });
+
+            // Dominant / Missing badges
+            const summaryBadgeContainer = document.getElementById('elementSummaryBadge');
+            let summaryHTML = `<span class="px-2.5 py-1 text-xs rounded-lg font-medium text-white" style="background-color: ${maxElem.color}">우세: ${maxElem.label}</span>`;
+            if (minElems.length > 0) {
+                const missingNames = minElems.map(e => e.label.split(' ')[0]).join(', ');
+                summaryHTML += `<span class="px-2.5 py-1 text-xs rounded-lg font-medium bg-stone-200 text-stone-700">부족: ${missingNames}</span>`;
+            } else {
+                summaryHTML += `<span class="px-2.5 py-1 text-xs rounded-lg font-medium bg-emerald-100 text-emerald-800">오행 구족(五行具足)</span>`;
+            }
+            summaryBadgeContainer.innerHTML = summaryHTML;
+
+            // Render Cards Grid
+            const gridContainer = document.getElementById('elementCardsGrid');
+            gridContainer.innerHTML = '';
+
+            const progressBar = document.getElementById('elementProgressBar');
+            progressBar.innerHTML = '';
+
+            const legendContainer = document.getElementById('elementLegend');
+            legendContainer.innerHTML = '';
+
+            elemDetails.forEach(item => {
+                const count = counts[item.type];
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+
+                const card = document.createElement('div');
+                card.className = `${item.bg} rounded-xl p-3 border border-stone-200/80 flex flex-col justify-between shadow-sm`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-center text-xs font-bold" style="color: ${item.color}">
+                        <span>${item.label}</span>
+                        <span>${count}개</span>
+                    </div>
+                    <div class="text-2xl font-bold font-serif my-1" style="color: ${item.color}">${pct}%</div>
+                    <div class="w-full bg-stone-200/80 h-1.5 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full" style="width: ${pct}%; background-color: ${item.color}"></div>
+                    </div>
+                `;
+                gridContainer.appendChild(card);
+
+                if (pct > 0) {
+                    const seg = document.createElement('div');
+                    seg.className = `h-full transition-all duration-500 relative cursor-pointer`;
+                    seg.style.width = `${pct}%`;
+                    seg.style.backgroundColor = item.color;
+                    seg.title = `${item.label}: ${count}개 (${pct}%)`;
+                    progressBar.appendChild(seg);
+
+                    const legendItem = document.createElement('span');
+                    legendItem.className = 'flex items-center space-x-1';
+                    legendItem.innerHTML = `<span class="w-2.5 h-2.5 rounded-full" style="background-color: ${item.color}"></span><span>${item.label.split(' ')[0]} ${pct}%</span>`;
+                    legendContainer.appendChild(legendItem);
+                }
+            });
+
+            return counts;
+        }
+
+        function renderEasyInterpretation(dayGan, elemCounts) {
+            const ganInfo = ELEMENTS_MAP[dayGan] || { hanja: dayGan, hangul: dayGan, color: '#15803D' };
+            const dayHangul = ganInfo.hangul || dayGan;
+            const info = DAY_MASTER_INFO[dayHangul] || DAY_MASTER_INFO['갑'];
+
+            document.getElementById('dayMasterChar').innerText = ganInfo.hanja;
+            document.getElementById('dayMasterChar').style.color = ganInfo.color;
+            document.getElementById('dayMasterTitle').innerText = `${info.name} - ${info.title}`;
+            document.getElementById('dayMasterSub').innerText = `나의 주체성과 본성을 다스리는 일간(日干)`;
+
+            document.getElementById('dayMasterDescText').innerText = info.desc;
+
+            // Generate customized elemental advice for middle schoolers
+            let advice = `${info.classical}\n\n💡 오행 균형 조언: `;
+            const maxElem = Object.keys(elemCounts).reduce((a, b) => elemCounts[a] > elemCounts[b] ? a : b);
+            const minElem = Object.keys(elemCounts).reduce((a, b) => elemCounts[a] < elemCounts[b] ? a : b);
+
+            const elemNames = { wood: '목(나무)', fire: '화(불)', earth: '토(흙)', metal: '금(쇠)', water: '수(물)' };
+
+            if (elemCounts[maxElem] >= 4) {
+                advice += `사주에 ${elemNames[maxElem]} 기운이 강하게 몰려 있네요! 한쪽으로 치우치지 않도록 느긋하고 유연한 마음가짐을 갖고 산책이나 운동을 즐기면 훨씬 개운해집니다.`;
+            } else if (elemCounts[minElem] === 0) {
+                advice += `${elemNames[minElem]} 기운이 사주에 약한 편이에요. 취미 생활이나 긍정적인 습관을 통해 내 부족한 기운을 다채롭게 채워보세요!`;
+            } else {
+                advice += `오행 에너지가 전반적으로 골고루 조화를 이루고 있습니다. 내 강점을 살려 꾸준히 전진하세요!`;
+            }
+
+            document.getElementById('elementalAdviceText').innerText = advice;
+        }
+
+        async function generateAiSajuReading() {
+            if (!currentSajuData) {
+                showToast("먼저 사주 정보를 계산해주세요.");
+                return;
+            }
+
+            const btn = document.getElementById('btnAiAnalyze');
+            const loading = document.getElementById('aiLoading');
+            const resultBox = document.getElementById('aiReadingResult');
+            const contentEl = document.getElementById('aiReadingContent');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            loading.classList.remove('hidden');
+            resultBox.classList.add('hidden');
+
+            const p = currentSajuData.pillars;
+            const sajuSummary = `
+- 성별: ${currentSajuData.gender}
+- 생년월일: 양력 ${currentSajuData.solar} (음력 ${currentSajuData.lunar})
+- 일간(나의 본질): ${currentSajuData.dayGan}
+- 년주: ${p.year.gan}${p.year.zhi}
+- 월주: ${p.month.gan}${p.month.zhi}
+- 일주: ${p.day.gan}${p.day.zhi}
+- 시주: ${currentSajuData.isTimeUnsure ? '모름' : p.time.gan + p.time.zhi}
+- 오행 분포: 목(${currentSajuData.elemCounts.wood}), 화(${currentSajuData.elemCounts.fire}), 토(${currentSajuData.elemCounts.earth}), 금(${currentSajuData.elemCounts.metal}), 수(${currentSajuData.elemCounts.water})
+            `;
+
+            const systemPrompt = `너는 명리학 고전(적천수, 자평진전, 명리약언)에 정통한 친절한 사주 상담사야. 
+중학생들도 쉽고 재밌게 이해할 수 있도록 비유와 이모티콘을 사용해서 친절하게 설명해줘.
+원문 한자의 난해한 용어는 쉽고 쉬운 한국어 예시로 풀어서 설명해줘.
+출력 형식은 다음 3가지로 나눠서 짧고 명확하게 정리해줘:
+1. 🌟 내 사주 캐릭터와 성격 (일간 중심 비유)
+2. ⚖️ 고전(적천수·자평진전) 관점의 오행 균형 분석 및 추천 행동
+3. 🎓 학업, 인간관계, 미래를 위한 따뜻한 조언 한마디`;
+
+            const userQuery = `다음 사주 정보를 바탕으로 중학생 눈높이에 맞춘 쉽고 흥미로운 사주 풀이를 작성해줘:\n${sajuSummary}`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    // Simple Markdown formatting to HTML
+                    const htmlText = text
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\n\n/g, '<br><br>')
+                        .replace(/\n/g, '<br>');
+
+                    contentEl.innerHTML = htmlText;
+                    resultBox.classList.remove('hidden');
+                } else {
+                    showToast("AI 해설을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("AI 연동 도중 오류가 발생했습니다.");
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                loading.classList.add('hidden');
+            }
+        }
+
+        // Toast Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // Copy Summary Text
+        function copySummaryText() {
+            const dateText = document.getElementById('convertedDateText').innerText;
+            const dayMaster = document.getElementById('dayMasterTitle').innerText;
+            const desc = document.getElementById('dayMasterDescText').innerText;
+
+            const summary = `[명리(命理) 사주팔자 오행 분석]\n${dateText}\n\n${dayMaster}\n${desc}`;
+
+            const textarea = document.createElement('textarea');
+            textarea.value = summary;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast("사주 요약 결과가 클립보드에 복사되었습니다.");
+        }
+    </script>
+</body>
+</html>
